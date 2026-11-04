@@ -1,0 +1,7 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%-- Menú de la aplicación (lo incluyen todas las páginas). Ya está hecho: no es necesario modificarlo. --%>
+<nav class="menu">
+    <a class="marca" href="index.html">🌳 Árboles genealógicos</a>
+    <a class="enlace <%= "construir".equals(request.getAttribute("seccion")) ? "activo" : "" %>" href="construir">Construir árbol genealógico</a>
+    <a class="enlace <%= "arboles".equals(request.getAttribute("seccion")) ? "activo" : "" %>" href="arboles">Árboles guardados</a>
+</nav>
