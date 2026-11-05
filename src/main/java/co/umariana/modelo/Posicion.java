@@ -51,8 +51,7 @@ public final class Posicion {
      * @return true solo si la posición es exactamente "1"
      */
     public static boolean esSujeto(String posicion) {
-        // TODO Etapa 1
-        throw new UnsupportedOperationException("TODO: esSujeto");
+        return SUJETO.equals(posicion);
     }
 
     /**
@@ -61,8 +60,10 @@ public final class Posicion {
      * Ejemplos válidos: "1", "2", "13", "2047". Inválidos: null, "", "0", "01", "-2", "2.0", " 2", "2048", "abc".
      */
     public static boolean esAhnentafel(String posicion) {
-        // TODO Etapa 1
-        throw new UnsupportedOperationException("TODO: esAhnentafel");
+         if (posicion == null || !posicion.matches("[1-9][0-9]{0,3}")) {
+        return false;
+    }
+    return Integer.parseInt(posicion) <= MAX_AHNENTAFEL;
     }
 
     /**
@@ -72,32 +73,39 @@ public final class Posicion {
      * "1.0", "1.01", "1.10000", ".1", "1.1.", "1.a".
      */
     public static boolean esDAboville(String posicion) {
-        // TODO Etapa 1
-        throw new UnsupportedOperationException("TODO: esDAboville");
+        return posicion != null
+            && posicion.length() <= MAX_LONGITUD
+            && posicion.matches("1(\\.[1-9][0-9]{0,3})+");
     }
 
     /**
      * @return true si es Ahnentafel o d'Aboville (ver esAhnentafel y esDAboville)
      */
     public static boolean esValida(String posicion) {
-        // TODO Etapa 1
-        throw new UnsupportedOperationException("TODO: esValida");
+        if (posicion == null || posicion.trim().isEmpty()) {
+            return false;
+        }
+        return esAhnentafel(posicion) || esDAboville(posicion);
     }
 
     /**
      * @return true si es un ASCENDIENTE: Ahnentafel válida distinta de "1"
      */
     public static boolean esAscendiente(String posicion) {
-        // TODO Etapa 1
-        throw new UnsupportedOperationException("TODO: esAscendiente");
+        if (posicion == null || posicion.trim().isEmpty()) {
+            return false;
+        }
+        return esAhnentafel(posicion) && !posicion.trim().equals("1");
     }
 
     /**
      * @return true si es un DESCENDIENTE: d'Aboville válida (el sujeto "1" NO es descendiente de sí mismo)
      */
     public static boolean esDescendiente(String posicion) {
-        // TODO Etapa 1
-        throw new UnsupportedOperationException("TODO: esDescendiente");
+        if (posicion == null || posicion.trim().isEmpty()) {
+            return false;
+        }
+        return esDAboville(posicion) && !posicion.trim().equals("1");
     }
 
     /**
@@ -107,8 +115,17 @@ public final class Posicion {
      * @throws IllegalArgumentException si la posición no es Ahnentafel válida
      */
     public static String posicionDelPadre(String ahnentafel) {
-        // TODO Etapa 1
-        throw new UnsupportedOperationException("TODO: posicionDelPadre");
+        if (!esAhnentafel(ahnentafel)) {
+            throw new IllegalArgumentException("La posición Ahnentafel no es válida.");
+        }
+        
+        try {
+            long n = Long.parseLong(ahnentafel.trim());
+            long padre = n * 2;
+            return String.valueOf(padre);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("La posición Ahnentafel excede el formato numérico permitido.", e);
+        }
     }
 
     /**
@@ -117,8 +134,17 @@ public final class Posicion {
      * @throws IllegalArgumentException si la posición no es Ahnentafel válida
      */
     public static String posicionDeLaMadre(String ahnentafel) {
-        // TODO Etapa 1
-        throw new UnsupportedOperationException("TODO: posicionDeLaMadre");
+        if (!esAhnentafel(ahnentafel)) {
+            throw new IllegalArgumentException("La posición Ahnentafel no es válida.");
+        }
+        
+        try {
+            long n = Long.parseLong(ahnentafel.trim());
+            long madre = (n * 2) + 1;
+            return String.valueOf(madre);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("La posición Ahnentafel excede el formato numérico permitido.", e);
+        }
     }
 
     /**
@@ -128,8 +154,17 @@ public final class Posicion {
      * @throws IllegalArgumentException si no es un ascendiente (el sujeto "1" no tiene hijo en la línea)
      */
     public static String posicionDelHijoEnLinea(String ahnentafel) {
-        // TODO Etapa 1
-        throw new UnsupportedOperationException("TODO: posicionDelHijoEnLinea");
+        if (!esAscendiente(ahnentafel)) {
+            throw new IllegalArgumentException("La posición no corresponde a un ascendiente válido.");
+        }
+        
+        try {
+            long n = Long.parseLong(ahnentafel.trim());
+            long hijo = n / 2;
+            return String.valueOf(hijo);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("La posición Ahnentafel excede el formato numérico permitido.", e);
+        }
     }
 
     /**
@@ -139,8 +174,16 @@ public final class Posicion {
      * @throws IllegalArgumentException si no es un descendiente (d'Aboville válida)
      */
     public static String posicionDelProgenitor(String daboville) {
-        // TODO Etapa 1
-        throw new UnsupportedOperationException("TODO: posicionDelProgenitor");
+        if (!esDescendiente(daboville)) {
+            throw new IllegalArgumentException("La posición no corresponde a un descendiente válido.");
+        }
+        
+        int ultimoPunto = daboville.lastIndexOf('.');
+        if (ultimoPunto == -1) {
+            throw new IllegalArgumentException("La posición de d'Aboville no tiene un progenitor válido.");
+        }
+        
+        return daboville.substring(0, ultimoPunto);
     }
 
     /**
@@ -149,8 +192,17 @@ public final class Posicion {
      * @throws IllegalArgumentException si no es un descendiente (d'Aboville válida)
      */
     public static int orden(String daboville) {
-        // TODO Etapa 1
-        throw new UnsupportedOperationException("TODO: orden");
+        if (!esDescendiente(daboville)) {
+            throw new IllegalArgumentException("La posición no corresponde a un descendiente válido.");
+        }
+        
+        int ultimoPunto = daboville.lastIndexOf('.');
+        if (ultimoPunto == -1) {
+            throw new IllegalArgumentException("La posición d'Aboville no tiene un número de orden válido.");
+        }
+        
+        String ultimoNumero = daboville.substring(ultimoPunto + 1);
+        return Integer.parseInt(ultimoNumero);
     }
 
     /**
@@ -161,7 +213,31 @@ public final class Posicion {
      * @throws IllegalArgumentException si la posición no es válida
      */
     public static int generacion(String posicion) {
-        // TODO Etapa 1
-        throw new UnsupportedOperationException("TODO: generacion");
+        if (!esValida(posicion)) {
+            throw new IllegalArgumentException("La posición proporcionada no es válida.");
+        }
+        
+        posicion = posicion.trim();
+        
+        // Si es Ahnentafel (empieza con un número simple sin puntos)
+        if (posicion.matches("\\d+")) {
+            long n = Long.parseLong(posicion);
+            if (n == 1) {
+                return 0;
+            }
+            // Parte entera del logaritmo en base 2 de n
+            return 63 - Long.numberOfLeadingZeros(n);
+        } 
+        // Si es d'Aboville (contiene puntos)
+        else {
+            // La cantidad de generaciones corresponde al número de puntos en la cadena
+            int contadorPuntos = 0;
+            for (int i = 0; i < posicion.length(); i++) {
+                if (posicion.charAt(i) == '.') {
+                    contadorPuntos++;
+                }
+            }
+            return contadorPuntos;  
+        }
     }
 }
