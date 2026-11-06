@@ -41,8 +41,30 @@ public class Persona {
      * </ul>
      */
     public void validar() {
-        // TODO Etapa 1
-        throw new UnsupportedOperationException("TODO: validar");
+        // 1. Validar que la posición sea válida (Ahnentafel o d'Aboville)
+        if (!Posicion.esValida(posicion)) {
+            throw new IllegalArgumentException("La posición no es válida.");
+        }
+
+        // 2. Validar que el nombre no sea nulo, no esté en blanco y no exceda MAX_NOMBRE
+        if (nombre == null || nombre.trim().isEmpty() || nombre.length() > MAX_NOMBRE) {
+            throw new IllegalArgumentException("El nombre no es válido (es nulo, está en blanco o excede la longitud máxima).");
+        }
+
+        // 3. Validar que el nombre no contenga el carácter ';' ni saltos de línea
+        if (nombre.contains(";") || nombre.contains("\n") || nombre.contains("\r")) {
+            throw new IllegalArgumentException("El nombre contiene caracteres prohibidos (';' o saltos de línea).");
+        }
+
+        // 4. Validar que el año de nacimiento sea mayor que 0
+        if (nacimiento <= 0) {
+            throw new IllegalArgumentException("El año de nacimiento debe ser mayor que 0.");
+        }
+
+        // 5. Validar que el año de fallecimiento no sea menor que el de nacimiento (si no es null)
+        if (fallecimiento != null && fallecimiento < nacimiento) {
+            throw new IllegalArgumentException("El año de fallecimiento no puede ser menor que el año de nacimiento.");
+        }
     }
 
     public String getPosicion() { return posicion; }
